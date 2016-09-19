@@ -1,0 +1,21 @@
+body,
+textarea,
+input{
+  font: 13px "Trebuchet MS", sans-serif;
+}
+
+.chat{
+  max-width: 300px;
+}
+
+#chat-messages,
+.chat textarea,
+#chat-name{
+  border:1px solid #bbb;
+}
+
+#chat-messages{
+  height:300px;
+  width:100%;
+  overflow-y:scroll;
+}

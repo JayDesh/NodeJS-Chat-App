@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="./css/styles.css" media="screen" title="no title" charset="utf-8">
+  </head>
+  <body>
+    <div class="chat">
+      <input type="text" id="chat-name" value="" placeholder="Enter name">
+      <div id="chat-messages">
+      </div>
+      <textarea id="chat-textarea" name="name" rows="2" cols="40" placeholder="Type your messages"></textarea>
+      <div id="chat-status">Status: <span>Idle</span></div>
+    </div>
+    <script src="http://127.0.0.1:8080/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      (function () {
+        var socket,
+            chatStatus;
+
+        var getNode = function ( id ){
+          return document.getElementById( id );
+        };
+
+        if( typeof socket === 'undefined' ){
+          socket = io.connect( 'http://127.0.0.1:8080/' );
+        }
+
+
+        //Listen for output.
+        socket.on('output', function( data){
+          console.log(data);
+        });
+        var defaultStatus = {"message" : "Idle" };
+
+
+        function updateStatus( data ){
+          var chatStatus = getNode( 'chat-status' ).children[0];
+          chatStatus.innerHTML = data.message;
+          if( data.clear ){
+            getNode( 'chat-textarea' ).value ='';
+          }
+          if( data.message !== defaultStatus.message ){
+            var delay = setTimeout( function (){
+              updateStatus( defaultStatus );
+              clearInterval( delay);
+            }, 3000);
+          }
+        }
+
+        socket.on('status', function ( data ) {
+          console.log('received response from Server');
+          console.log( data );
+          updateStatus(data);
+        } );
+
+        var chatMessage = getNode( 'chat-textarea' ),
+            chatName = getNode( 'chat-name' ),
+            socket;
+        console.log( chatMessage.innerHTML + chatName.text );
+        chatMessage.addEventListener( 'keydown', function (e){
+          var self = this;
+          if( e.key ==='Enter' && !e.shiftKey){
+            socket.emit('input',{"message":self.value, "name": chatName.value});
+
+          }
+
+        });
+
+
+      })();
+    </script>
+  </body>
+</html>
